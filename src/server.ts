@@ -1,24 +1,28 @@
-import express, { request } from "express";
+import "reflect-metadata";
+import express,{Request, Response, NextFunction} from "express";
+import "express-async-errors";
 
-// @types/express
+import { router } from "./routes";
+
+import "./database";
+
 const app = express();
-/**
- * GET    => Buscar uma informação
- * POST   => Inserir (Criar) uma informação
- * PUT    => Alterar uma informação
- * DELETE => Remover uma dado
- * PATCH  => Alrerar uma informação especifica
- */
 
-app.get("/test", (request, response) => {
-    //Request => Entrando
-    //Reponse => Saindo
-    return response.send("Olá NLW");
-});
+app.use(express.json());
 
+app.use(router);
 
-app.post("/test-post",(request, response) => {
-    return response.send("olá NLW método POST");
+app.use((err: Error, request: Request, response: Response, next: NextFunction) => {
+  if(err instanceof Error){
+    return response.status(400).json({
+      error: err.message,
+    });
+  }
+
+  return response.status(500).json({
+    status: "error",
+    message: "internal Server Error"
+  })
 })
-//http://localhost:3000
+
 app.listen(3000, () => console.log("Server is running"));
